@@ -2,10 +2,11 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
+from app.core.config import settings
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", 'mysql+aiomysql://user:password@localhost:3306/optistream')
+DATABASE_URL = settings.DATABASE_URL
 
 # create async engine
 # pool size and max overflow are critical for production tuning to manage concurrent connections.
