@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", 'mysql+aiomysql://root:1VK14ec007!123@localhost:3306/optistream')
+DATABASE_URL = os.getenv("DATABASE_URL", 'mysql+aiomysql://user:password@localhost:3306/optistream')
 
 # create async engine
 # pool size and max overflow are critical for production tuning to manage concurrent connections.
