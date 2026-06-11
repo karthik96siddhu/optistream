@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.core.database import async_engine, Base
+from app.api.orders import router as order_router_v1
 
 app = FastAPI(
     title="Optistream API",
@@ -17,5 +18,8 @@ async def on_startup():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "engine": "asynchronous"}
+
+# Include API routers
+app.include_router(order_router_v1, prefix="/api/v1")
 
 
