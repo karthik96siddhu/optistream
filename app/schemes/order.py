@@ -11,7 +11,7 @@ class OrderCreate(BaseModel):
 
 
 # what we return to the client (includes db generated fields)
-class OrderRead(BaseModel):
+class OrderResponse(BaseModel):
     id: int
     customer_email: EmailStr
     product_sku: str
