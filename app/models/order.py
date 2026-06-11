@@ -5,7 +5,7 @@ from app.core.database import Base
 
 class OrderStatus(enum.Enum):
     PENDING = 'pending'
-    PROCESSING = 'processing',
+    PROCESSING = 'processing'
     COMPLETED = 'completed'
     FAILED = 'failed'
 
@@ -22,5 +22,5 @@ class Order(Base):
 
     # composite index for faster analytical queries.
     __table_args__ = (
-        Index('idx_customer_status', 'customer_email', 'status')
+        Index('idx_customer_status', 'customer_email', 'status'),
     )
