@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.order_service import OrderService
+from app.services.worker_service import WorkerService
 from app.schemes.order import OrderCreate, OrderResponse
-from app.core.database import get_db
+from app.core.database import get_db, AsyncSessionLocal
 
 router = APIRouter(prefix='/orders', tags=['orders'])
 
@@ -27,4 +28,37 @@ async def get_order(order_id: int, db: AsyncSession = Depends(get_db)):
             detail = f"Order with ID {order_id} not found."
         )
     return order
+
+@router.post("/{order_id}/process-invoice", status_code=status.HTTP_202_ACCEPTED)
+async def trigger_invoice_processing(
+    order_id: int,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db) 
+):
+    """
+    Ingest endpoint to trigger invoice generation asynchronously.
+    Return HTTP 202 Accepted immediately.
+    """
+    # Quick structural validation: Does this order even exist
+    order = await OrderService.get_order_by_id(db, order_id)
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order {order_id} does not exist. cannot process invoice."
+        )
+
+    # Enqueue the slow job to run on the background event queue
+    background_tasks.add_task(
+        WorkerService.process_invoice_pipeline,
+        order_id= order.id,
+        db_session_factory = AsyncSessionLocal
+    )
+
+    return {
+        "message": "Invoice generation pipeline initiated successfully.",
+        "order_id": order.id,
+        "current_status": order.status
+    }
+
+
         
