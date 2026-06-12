@@ -7,7 +7,7 @@ from app.models.order import OrderStatus
 class WorkerService:
 
     @staticmethod
-    async def process_invoice_pipeline(order_id: int, db_session_factory: AsyncSession) -> None:
+    async def process_invoice_pipeline(order_id: int, db_session_factory) -> None:
         """"
         Background worker pipeline.
         Accepts a session factory instead of an active session, as background tasks
