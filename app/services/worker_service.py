@@ -1,8 +1,10 @@
 import asyncio
+import os
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.order_service import OrderService
 from app.services.invoice_service import InvoiceService
 from app.models.order import OrderStatus
+from app.core.s3_client import get_s3_client, S3_BUCKET_NAME
 
 class WorkerService:
 
@@ -36,7 +38,26 @@ class WorkerService:
                     order
                 )
 
-                # NOTE: Phase 5 we will inject AWS s3 upload here using local_pdf_path
+                # Upload the file to S3/MinIO using standard boto3 calls
+                s3_key = f"invoices/invoice_order_{order_id}.pdf"
+                s3_client = get_s3_client()
+
+                print(f"[BACKGROUND WORKER] Uploading {s3_key} to bucket: {S3_BUCKET_NAME}...")
+
+                #run in executor since boto3 upload_file is a synchronous, blocking network I/O call.
+                await loop.run_in_executor(
+                    None,
+                    s3_client.upload_file,
+                    local_pdf_path, # local source path
+                    S3_BUCKET_NAME, # destination path
+                    s3_key          # storage path key inside bucket
+                )
+
+                # Cleanup: Remove local file rom server disk to optimise system storage.
+                if os.path.exists(local_pdf_path):
+                    os.remove(local_pdf_path)
+                    print(f"[BACKGROUND WORKER] Temporary local file removed")
+                
 
                 # Mark as complete upon successfull processing
                 order.status = OrderStatus.COMPLETED
