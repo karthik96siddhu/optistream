@@ -4,7 +4,7 @@ from app.core.s3_client import get_s3_client, S3_BUCKET_NAME
 class StorageService:
 
     @staticmethod
-    def generate_secure_download_url(order_id: int, expires_in_second: int = 900) -> str | None:
+    def generate_secure_download_url(order_id: int, expires_in_second: int = 900):
         """
         Generate a secure time-bound  presigned download URL for a specific order invoice
         Default to 900 seconds (15 minutes)
