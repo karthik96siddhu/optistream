@@ -17,7 +17,7 @@ async def on_startup():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "engine": "asynchronous api test"}
+    return {"status": "healthy", "engine": "asynchronous"}
 
 # Include API routers
 app.include_router(order_router_v1, prefix="/api/v1")
