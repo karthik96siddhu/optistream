@@ -1,5 +1,9 @@
 # optistream
 
+<!-- command to run local -->
+
+### uvicorn app.main:app --reload
+
 <!-- Docker command -->
 
 ### docker build -t optistream-backend:latest .
