@@ -1,1 +1,11 @@
-Generic single-database configuration with an async dbapi.
+<!-- to initialise alembic -->
+
+### $alembic init -t async migrations
+
+<!-- which creates migrations folder and files to track version -->
+
+<!-- If you already created a db and table manually and try to replace with alembic you will get
+    empty upgrade/downgrade method version file. So drop table and version from local mySQL and run below
+    command again. -->
+
+### alembic revision --autogenerate -m "initial_orders_table"
