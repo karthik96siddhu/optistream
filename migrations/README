@@ -9,3 +9,7 @@
     command again. -->
 
 ### alembic revision --autogenerate -m "initial_orders_table"
+
+<!-- Now to make sure MYSQL db is completely in sync with our version file, run below command -->
+
+### alembic upgrade head
