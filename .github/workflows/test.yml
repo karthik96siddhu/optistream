@@ -9,7 +9,22 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest # GitHub's macOS runner (similar to your Mac)
+    runs-on: ubuntu-latest  # Use Ubuntu for better container support
+    
+    # Add MySQL service container
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: optistream_test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
 
     steps:
       # Step 1: Get your code
@@ -27,29 +42,46 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 3.5: Create .env file from secrets
+      # Step 3.5: Create .env file for tests (using container database)
       - name: Create .env file
         run: |
           cat > .env << EOF
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          TEST_DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}
-          SECRET_KEY=${{ secrets.SECRET_KEY }}
-          DEBUG=${{ secrets.DEBUG }}
+          DATABASE_URL=mysql+aiomysql://root:testpass@localhost:3306/optistream_test
+          TEST_DATABASE_URL=mysql+aiomysql://root:testpass@localhost:3306/optistream_test
+          SECRET_KEY=github-actions-test-key-${{ github.run_id }}
+          DEBUG=False
           EOF
 
-      # Step 4: Run tests with Allure
+      # Step 4: Wait for MySQL to be ready
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h localhost -u root -ptestpass &> /dev/null; then
+              echo "MySQL is up!"
+              exit 0
+            fi
+            echo "Waiting for MySQL... ($i/30)"
+            sleep 1
+          done
+          echo "MySQL failed to start"
+          exit 1
+
+      # Step 5: Run tests with Allure
       - name: Run tests
         run: |
           pytest app/tests -v --alluredir=allure-results
 
-      # Step 5: Generate Allure report
+      # Step 6: Generate Allure report
       - name: Generate Allure Report
         if: always() # Run even if tests fail
         run: |
-          brew install allure
-          allure generate allure-results -o allure-report --clean
+          sudo apt-get update
+          sudo apt-get install -y default-jre
+          wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.23.1/allure-commandline-2.23.1.zip
+          unzip allure-commandline-2.23.1.zip
+          ./allure-2.23.1/bin/allure generate allure-results -o allure-report --clean
 
-      # Step 6: Upload report as artifact (view in GitHub)
+      # Step 7: Upload report as artifact (view in GitHub)
       - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,7 +89,7 @@ jobs:
           name: allure-report
           path: allure-report/
 
-      # Step 7: Add test summary to PR (optional)
+      # Step 8: Add test summary to PR (optional)
       - name: Test Report
         if: always()
         uses: dorny/test-reporter@v1
