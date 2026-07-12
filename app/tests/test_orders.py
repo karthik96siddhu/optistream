@@ -3,10 +3,10 @@ from app.models.order import Order
 from sqlalchemy.future import select
 
 @pytest.mark.asyncio
-async def ters_create_order_successfully(async_client, db_session):
+async def test_create_order_successfully(async_client, db_session):
     # 1. Arrange: Prepare a valid payload matching our Pydantic schema
     payload = {
-        "customet_email": "test-buyer@company.com",
+        "customer_email": "test-buyer@company.com",
         "product_sku": "SKU-ASYNC-99",
         "quantity": 5,
         "total_price": 199.4
