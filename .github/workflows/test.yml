@@ -13,7 +13,7 @@ jobs:
 
     steps:
       # Step 1: Get your code
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Step 2: Setup Python
       - name: Set up Python
@@ -42,7 +42,7 @@ jobs:
       # Step 6: Upload report as artifact (view in GitHub)
       - name: Upload Allure Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report/
