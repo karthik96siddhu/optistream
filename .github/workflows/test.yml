@@ -27,6 +27,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Step 3.5: Create .env file from secrets
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          TEST_DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          DEBUG=${{ secrets.DEBUG }}
+          EOF
+
       # Step 4: Run tests with Allure
       - name: Run tests
         run: |
