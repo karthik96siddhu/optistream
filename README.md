@@ -1,12 +1,40 @@
 # optistream
 
-<!-- command to run local -->
+## Quick Start
 
-### uvicorn app.main:app --reload
+### Run Local Server
 
-<!-- Docker command -->
+```bash
+uvicorn app.main:app --reload
+```
 
-### docker build -t optistream-backend:latest .
+### Run Tests
+
+```bash
+# Run tests and generate Allure report
+./run_tests.sh
+
+# Or just run tests
+pytest
+
+# View existing report
+allure open allure-report
+```
+
+### Docker
+
+```bash
+docker build -t optistream-backend:latest .
+```
+
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for automated testing.
+
+- Every push/PR runs tests automatically
+- Allure reports generated on each run
+- Reports available as GitHub artifacts
+- View results in: `Actions` tab → Select run → `Artifacts`
 
 ### docker run -d -p 8000:8000 --name optistream-api --env-file .env optistream-backend:latest
 
