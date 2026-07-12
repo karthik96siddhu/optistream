@@ -41,7 +41,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       # Step 3.1: Install MySQL client tools
       - name: Install MySQL client
         run: |
@@ -84,7 +84,7 @@ jobs:
       # Step 5: Run tests with Allure
       - name: Run tests
         run: |
-          pytest app/tests -v --alluredir=allure-results
+          pytest app/tests -v --alluredir=allure-results --junit-xml=test-results.xml
 
       # Step 6: Generate Allure report
       - name: Generate Allure Report
@@ -104,12 +104,12 @@ jobs:
           name: allure-report
           path: allure-report/
 
-      # Step 8: Add test summary to PR (optional)
+      # Step 8: Add test summary to PR
       - name: Test Report
         if: always()
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v1.8.0
         with:
           name: Pytest Results
-          path: ".pytest_cache/**/*.xml"
-          reporter: "java-junit"
+          path: test-results.xml
+          reporter: java-junit
           fail-on-error: false
