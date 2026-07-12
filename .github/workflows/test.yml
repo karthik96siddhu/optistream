@@ -10,7 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest # Use Ubuntu for better container support
-    
+
     # Add permissions for test reporting
     permissions:
       contents: read
@@ -119,3 +119,18 @@ jobs:
           path: test-results.xml
           reporter: java-junit
           fail-on-error: false
+
+  # Deploy job - runs only after tests pass
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          npm install -g @railway/cli
+          railway up --service optistream --environment production
