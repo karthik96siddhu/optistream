@@ -9,8 +9,8 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # Use Ubuntu for better container support
-    
+    runs-on: ubuntu-latest # Use Ubuntu for better container support
+
     # Add MySQL service container
     services:
       mysql:
